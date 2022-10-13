@@ -1,0 +1,81 @@
+#### AppD Cloud Configs
+appdynamics-cloud-k8s-monitoring:
+  clusterName: test-appd-cloud
+  install:
+    clustermon: true
+    defaultInfraCollectors: true
+    logCollector: true
+  #containermonConfig:
+  #  clusterName: test-appd-cloud
+  #### ClusterMon Configs
+  #clustermonConfig:
+  #  clusterName: test-appd-cloud
+
+  #### LCA Config
+  logCollectorConfig:
+    container:
+      clusterName: test-appd-cloud
+      logging:
+        level: info
+      conditionalConfigs:
+      - condition:
+          operator: equals
+          key: kubernetes.container.name
+          value: test-app
+        config:
+          multiLinePattern: '^2022'
+          multiLineNegate: true
+          multiLineMatch: after
+          messageParser:
+            logback:
+              enabled: true
+              pattern: "%d{yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn} %p %C{1.} [%t] %m%n"
+      - condition:
+          operator: equals
+          key: kubernetes.pod.name
+          value: ad-service
+        config:
+          multiLinePattern: '^2022'
+          multiLineNegate: true
+          #multiLineMatch: after
+          messageParser:
+            log4J:
+              enabled: true
+              pattern: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg trace_id=%X{trace_id} span_id=%X{span_id} trace_flags=%X{trace_flags} %n"
+
+    
+#### Otel Collector Configs
+appdynamics-otel-collector:
+  clientId: agt_5UqIwnKnaW6U4p98w1x8RD
+  clientSecret: lANz1vJ96uk9fqsFdJ1KmODOeTOmkjoAoCwTnFge2hI
+  endpoint: https://wipro-nfr.observe.appdynamics.com/data
+  tokenUrl: https://wipro-nfr.observe.appdynamics.com/auth/39bb2fbd-909b-46f6-bde8-7f32fe043436/default/oauth2/token
+  #configOverride:
+  #  exporters:
+  #    logging:
+  #      loglevel: info
+  #  service:
+  #    extensions: [health_check, oauth2client, zpages]
+  #    pipelines:
+  #      logs:
+  #        receivers: [otlp]
+  #        processors: [batch, memory_limiter]
+  #        exporters: [logging, otlphttp]
+  #      metrics:
+  #        receivers: [otlp]
+  #        processors: [batch, memory_limiter]
+  #        exporters: [logging, otlphttp]
+  #      traces:
+  #        receivers: [otlp]
+  #        processors: [batch, memory_limiter]
+  #        exporters: [logging, otlphttp]
+  #    telemetry:
+  #      logs:
+  #        level: "debug"
+# Otel Collector Daemonset Specific Configs
+#otelCollectorPod:
+#  image: appdynamics/appdynamics-cloud-otel-collector:22.6.0-366
+#  imagePullPolicy: Always
+  # env:
+  #   - name: "HTTPS_PROXY"
+  #     value: "http://<proxy_host>:<proxy_port>"
