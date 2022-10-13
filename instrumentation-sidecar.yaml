@@ -1,0 +1,42 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: auto-instrumentation
+spec:
+  #exporter:
+  #  endpoint: http://localhost:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.25"
+  env:
+    - name: OTEL_EXPORTER_OTLP_INSECURE
+      value: "true"
+    - name: OTEL_LOG_LEVEL
+      value: "debug"
+    - name: OTEL_TRACES_EXPORTER
+      value: "otlp,logging"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:latest
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://localhost:4317"
+      - name: OTEL_JAVAAGENT_DEBUG
+        value: "true"
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:latest
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://localhost:4317"
+  #With python need to give env names as it does not support gRPC, but only http. With others, no need to give, have provided just for the sake of uniformity. Java and
+  #nodejs sections can be removed altogether
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.28b1
+    env:
+      - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        value: "http://localhost:4318/v1/traces"
+      - name: OTEL_PYTHON_LOG_LEVEL
+        value: "debug"

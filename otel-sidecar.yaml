@@ -1,0 +1,44 @@
+# This is the configuration for SideCar OpenTelemetry Collector.
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: sidecar-otel-collector
+spec:
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols: 
+          grpc:
+          http:
+    processors:
+    exporters:
+      logging:
+        loglevel: debug
+      zipkin:
+        endpoint: http://zipkin.otel.svc.cluster.local:9411/api/v2/spans
+        format: proto
+      jaeger:
+        endpoint: jaeger.otel.svc.cluster.local:14250
+        tls:
+          insecure: true
+      otlphttp:
+        endpoint: http://appdynamics-otel-collector-service.appdynamics.svc.cluster.local:4318
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        #metrics:
+        #  receivers: [otlp]
+        #  processors: []
+        #  exporters: [otlphttp]
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [logging,zipkin,jaeger,otlphttp]
+        logs:
+          receivers: [otlp]
+          exporters: [otlphttp]
+      telemetry:
+        logs:
+          level: "debug"
