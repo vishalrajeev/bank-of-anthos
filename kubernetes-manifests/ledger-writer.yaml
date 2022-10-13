@@ -26,7 +26,7 @@ spec:
       labels:
         app: ledgerwriter
       annotations:
-        sidecar.opentelemetry.io/inject: "false"
+        sidecar.opentelemetry.io/inject: "true"
         instrumentation.opentelemetry.io/inject-java: "true"
     spec:
       serviceAccountName: default

@@ -27,7 +27,7 @@ spec:
       labels:
         app: contacts
       annotations:
-        sidecar.opentelemetry.io/inject: "false"
+        sidecar.opentelemetry.io/inject: "true"
         instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       serviceAccountName: default

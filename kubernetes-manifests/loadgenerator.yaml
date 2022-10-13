@@ -28,7 +28,7 @@ spec:
         app: loadgenerator
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
-        sidecar.opentelemetry.io/inject: "false"
+        sidecar.opentelemetry.io/inject: "true"
         instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       serviceAccountName: default
