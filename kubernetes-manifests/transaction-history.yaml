@@ -25,14 +25,17 @@ spec:
     metadata:
       labels:
         app: transactionhistory
+      annotations:
+        sidecar.opentelemetry.io/inject: "false"
+        instrumentation.opentelemetry.io/inject-java: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
-      securityContext:
-        fsGroup: 1000
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
+      #securityContext:
+      #  fsGroup: 1000
+      #  runAsGroup: 1000
+      #  runAsNonRoot: true
+      #  runAsUser: 1000
       containers:
       - name: transactionhistory
         securityContext:
@@ -55,9 +58,9 @@ spec:
         - name: PORT
           value: "8080"
         - name: ENABLE_TRACING
-          value: "true"
+          value: "false"
         - name: ENABLE_METRICS
-          value: "true"
+          value: "false"
         - name: POLL_MS
           value: "100"
         - name: CACHE_SIZE

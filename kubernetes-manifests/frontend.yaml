@@ -25,6 +25,9 @@ spec:
     metadata:
       labels:
         app: frontend
+      annotations:
+        sidecar.opentelemetry.io/inject: "false"
+        instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -55,7 +58,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: ENABLE_TRACING
-          value: "true"
+          value: "false"
         - name: SCHEME
           value: "http"
          # Valid levels are debug, info, warning, error, critical. If no valid level is set, gunicorn will default to info.
@@ -124,6 +127,9 @@ spec:
           limits:
             cpu: 250m
             memory: 128Mi
+        command: ["/bin/sh"]
+        args: ['-c', 'OTEL_RESOURCE_ATTRIBUTES=container.id=$(sed -rn "s/^1:.+:\/.+\/(.+)$/\1/p" /proc/self/cgroup) && gunicorn -b :$PORT --threads 4 --log-config logging.conf --log-level=$LOG_LEVEL "frontend:create_app()"']
+
       volumes:
       - name: publickey
         secret:

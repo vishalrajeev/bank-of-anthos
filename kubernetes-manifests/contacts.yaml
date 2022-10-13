@@ -18,6 +18,7 @@ kind: Deployment
 metadata:
   name: contacts
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: contacts
@@ -25,6 +26,9 @@ spec:
     metadata:
       labels:
         app: contacts
+      annotations:
+        sidecar.opentelemetry.io/inject: "false"
+        instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -55,7 +59,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: ENABLE_TRACING
-          value: "true"
+          value: "false"
         # Valid levels are debug, info, warning, error, critical.
         # If no valid level is set, will default to info.
         - name: LOG_LEVEL
@@ -79,6 +83,9 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 10
+        command: ["/bin/sh"]
+        args: ['-c', 'OTEL_RESOURCE_ATTRIBUTES=container.id=$(sed -rn "s/^1:.+:\/.+\/(.+)$/\1/p" /proc/self/cgroup) && gunicorn -b :$PORT --threads 4 --log-config logging.conf --log-level=$LOG_LEVEL "contacts:create_app()"']
+
       volumes:
       - name: publickey
         secret:

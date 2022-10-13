@@ -25,6 +25,9 @@ spec:
     metadata:
       labels:
         app: userservice
+      annotations:
+        sidecar.opentelemetry.io/inject: "false"
+        instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -42,6 +45,7 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
+        #image: visraj06/userservice:0.1
         image: gcr.io/bank-of-anthos-ci/userservice:v0.5.6
         volumeMounts:
         - name: keys
@@ -58,7 +62,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: ENABLE_TRACING
-          value: "true"
+          value: "false"
         - name: TOKEN_EXPIRY_SECONDS
           value: "3600"
         - name: PRIV_KEY_PATH
@@ -85,6 +89,8 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        command: ["/bin/sh"]
+        args: ['-c', 'OTEL_RESOURCE_ATTRIBUTES=container.id=$(sed -rn "s/^1:.+:\/.+\/(.+)$/\1/p" /proc/self/cgroup) && gunicorn -b :$PORT --threads 2 --log-config logging.conf --log-level=$LOG_LEVEL "userservice:create_app()"']
       volumes:
       - name: keys
         secret:
